@@ -15,7 +15,8 @@ import com.garbagemule.MobArena.framework.Arena;
 import com.garbagemule.MobArena.waves.enums.*;
 import com.garbagemule.MobArena.MobArena;
 
-import com.nisovin.magicspells.events.SpellCastEvent;
+// we don't use MagicSpells.
+//import com.nisovin.magicspells.events.SpellCastEvent;
 
 public class MagicSpellsListener implements Listener
 {
@@ -41,7 +42,7 @@ public class MagicSpellsListener implements Listener
         }
     }
     
-    @EventHandler(priority = EventPriority.NORMAL)
+    /*@EventHandler(priority = EventPriority.NORMAL)
     public void onSpellCast(SpellCastEvent event)
     {
         Arena arena = plugin.getArenaMaster().getArenaWithPlayer(event.getCaster());
@@ -55,7 +56,7 @@ public class MagicSpellsListener implements Listener
            (type == WaveType.SWARM && disabledOnSwarm.contains(spell))) {
             event.setCancelled(true);
         }
-    }
+    }*/
     
     private void setupSpells(ConfigurationSection config)
     {

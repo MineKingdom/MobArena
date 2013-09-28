@@ -197,7 +197,7 @@ public class MobArena extends JavaPlugin
     }
     
     private void setupStrategies() {
-        healthStrategy = (hasHeroes ? new HealthStrategyHeroes() : new HealthStrategyStandard());
+        healthStrategy = new HealthStrategyHeroes(); //(hasHeroes ? new HealthStrategyHeroes() : new HealthStrategyStandard());
     }
     
     private void loadAbilities() {

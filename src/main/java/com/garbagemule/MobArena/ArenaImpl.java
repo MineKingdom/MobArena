@@ -421,6 +421,7 @@ public class ArenaImpl implements Arena
             // Remove player from spec list to avoid invincibility issues
             if (inSpec(p)) {
                 specPlayers.remove(p);
+                plugin.getServer().getPluginManager().callEvent(new ArenaPlayerLeaveSpectateEvent(p, this));
                 System.out.println("[MobArena] Player " + p.getName() + " joined the arena from the spec area!");
                 System.out.println("[MobArena] Invincibility glitch attempt stopped!");
             }
@@ -891,7 +892,9 @@ public class ArenaImpl implements Arena
     @Override
     public void movePlayerToLobby(Player p)
     {
-        specPlayers.remove(p); // If joining from spec area
+        if (specPlayers.remove(p)) { // If joining from spec area
+        	plugin.getServer().getPluginManager().callEvent(new ArenaPlayerLeaveSpectateEvent(p, this));
+        }
         lobbyPlayers.add(p);
         p.teleport(region.getLobbyWarp());
         p.setAllowFlight(false);
@@ -905,6 +908,8 @@ public class ArenaImpl implements Arena
         specPlayers.add(p);
         p.teleport(region.getSpecWarp());
         timeStrategy.setPlayerTime(p);
+        
+        plugin.getServer().getPluginManager().callEvent(new ArenaPlayerJoinSpectateEvent(p, this));
     }
 
     @Override
@@ -965,7 +970,9 @@ public class ArenaImpl implements Arena
         
         // readyPlayers before lobbyPlayers because of startArena sanity-checks
         readyPlayers.remove(p);
-        specPlayers.remove(p);
+        if (specPlayers.remove(p)) {
+        	plugin.getServer().getPluginManager().callEvent(new ArenaPlayerLeaveSpectateEvent(p, this));
+        }
         arenaPlayers.remove(p);
         lobbyPlayers.remove(p);
         arenaPlayerMap.remove(p);
