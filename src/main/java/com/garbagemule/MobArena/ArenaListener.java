@@ -74,6 +74,7 @@ import com.garbagemule.MobArena.listeners.MAGlobalListener.TeleportResponse;
 import com.garbagemule.MobArena.region.ArenaRegion;
 import com.garbagemule.MobArena.region.RegionPoint;
 import com.garbagemule.MobArena.repairable.*;
+import com.garbagemule.MobArena.util.PacketUtils;
 import com.garbagemule.MobArena.util.TextUtils;
 import com.garbagemule.MobArena.waves.MABoss;
 
@@ -500,6 +501,10 @@ public class ArenaListener
                             Messenger.tell(q, msg);
                         }
                     }
+                    
+                    for (Player player : arena.getPlayersInArena()) {
+                		PacketUtils.closeHealthBar(player);
+                	}
                 }
             }
             callKillEvent(p, damagee);
@@ -641,6 +646,19 @@ public class ArenaListener
         else if (damager instanceof LivingEntity) {
             if (!monsterInfight)
                 event.setCancelled(true);
+        }
+        
+        MABoss boss = arena.getMonsterManager().getBoss((LivingEntity) monster);
+        if (boss != null) {
+        	String name = boss.getEntity().getCustomName();
+        	double health = Math.min(1.0, boss.getHealth() / boss.getMaxHealth());
+        	
+        	if (name == null) {
+        		name = " ";
+        	}
+        	for (Player player : arena.getPlayersInArena()) {
+        		PacketUtils.updateHealthBar(name, player, health);
+        	}
         }
     }
     

@@ -7,14 +7,17 @@ import java.util.Map;
 import com.garbagemule.MobArena.events.ArenaCompleteEvent;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.Lever;
 
 import com.garbagemule.MobArena.events.NewWaveEvent;
 import com.garbagemule.MobArena.framework.Arena;
 import com.garbagemule.MobArena.region.ArenaRegion;
+import com.garbagemule.MobArena.util.PacketUtils;
 import com.garbagemule.MobArena.waves.*;
 import com.garbagemule.MobArena.waves.enums.WaveType;
 import com.garbagemule.MobArena.waves.types.BossWave;
@@ -112,6 +115,20 @@ public class MASpawnThread implements Runnable
             }
             return;
         }
+        
+        Wave currentWave = waveManager.getCurrent();
+        if (currentWave != null) {
+        	List<Block> levers = currentWave.getLevers();
+        	if (levers != null) {
+		        for (Block lever : levers) {
+		        	try {
+		        		Lever l = (Lever) lever.getState().getData();
+			        		l.setPowered(false);
+			        	lever.setData(l.getData(), true);
+		        	} catch (Throwable t) {}
+		        }
+        	}
+        }
 
         // Spawn the next wave.
         spawnWave(nextWave);
@@ -150,6 +167,17 @@ public class MASpawnThread implements Runnable
         int totalSpawnpoints = spawnpoints.size();
         int index = 0;
         double mul = w.getHealthMultiplier();
+        
+    	List<Block> levers = w.getLevers();
+    	if (levers != null) {
+	        for (Block lever : levers) {
+	        	try {
+	        		Lever l = (Lever) lever.getState().getData();
+		        		l.setPowered(true);
+		        	lever.setData(l.getData(), true);
+	        	} catch (Throwable t) {}
+	        }
+    	}
 
         for (Map.Entry<MACreature, Integer> entry : monsters.entrySet()) {
             for (int i = 0; i < entry.getValue(); i++, index++) {
@@ -186,6 +214,14 @@ public class MASpawnThread implements Runnable
                             e.setCustomName(bw.getBossName());
                             e.setCustomNameVisible(true);
                         }
+                        
+                        String name = boss.getEntity().getCustomName();
+                    	if (name == null) {
+                    		name = " ";
+                    	}
+                    	for (Player player : arena.getPlayersInArena()) {
+                    		PacketUtils.displayHealthBar(name, player, 1.0);
+                    	}
                         break;
                     case SWARM:
                         health = (int) (mul < 1D ? e.getMaxHealth() * mul : 1);

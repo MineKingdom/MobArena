@@ -56,8 +56,12 @@ public class MobArena extends JavaPlugin
     public static final double MIN_PLAYER_DISTANCE_SQUARED = 225D;
     public static final int ECONOMY_MONEY_ID = -29;
     public static Random random = new Random();
+    
+	private static MobArena instance;
 
     public void onEnable() {
+    	instance = this;
+    	
         // Initialize config-file
         loadConfigFile();
 
@@ -197,7 +201,7 @@ public class MobArena extends JavaPlugin
     }
     
     private void setupStrategies() {
-        healthStrategy = new HealthStrategyHeroes(); //(hasHeroes ? new HealthStrategyHeroes() : new HealthStrategyStandard());
+        healthStrategy = (hasHeroes ? new HealthStrategyHeroes() : new HealthStrategyStandard());
     }
     
     private void loadAbilities() {
@@ -297,4 +301,8 @@ public class MobArena extends JavaPlugin
         double minor = item.getDurability() / 100D;
         return major + minor;
     }
+
+	public static MobArena getInstance() {
+		return instance;
+	}
 }

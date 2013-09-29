@@ -43,6 +43,7 @@ public class AbilityManager
         if (abilities == null) abilities = new HashMap<String,Class<? extends Ability>>();
 
         register(ChainLightning.class);
+        register(ClerkBenediction.class);
         register(DisorientDistant.class);
         register(DisorientNearby.class);
         register(DisorientTarget.class);

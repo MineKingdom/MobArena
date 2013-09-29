@@ -17,6 +17,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.*;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.*;
+import org.bukkit.material.Lever;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.potion.PotionEffect;
 
@@ -1168,7 +1169,21 @@ public class ArenaImpl implements Arena
         removeMonsters();
         removeBlocks();
         removeEntities();
+        restoreLevers();
         clearPlayers();
+    }
+    
+    private void restoreLevers() {
+    	Collection<Block> levers = this.region.getLevers();
+    	if (levers != null) {
+	        for (Block lever : levers) {
+	        	try {
+	        		Lever l = (Lever) lever.getState().getData();
+		        		l.setPowered(false);
+		        	lever.setData(l.getData(), true);
+	        	} catch (Throwable t) {}
+	        }
+    	}
     }
     
     private void removeMonsters() {

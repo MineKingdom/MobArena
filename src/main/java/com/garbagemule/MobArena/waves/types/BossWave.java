@@ -74,8 +74,13 @@ public class BossWave extends AbstractWave
     }
     
     public void setHealth(BossHealth health) {
-        this.healthMultiplier = health.getMultiplier();
-        this.useHealthMultiplier = true;
+    	if (health.equals(BossHealth.ONE)) {
+    		this.flatHealth = 1;
+            this.useHealthMultiplier = false;
+    	} else {
+	        this.healthMultiplier = health.getMultiplier();
+	        this.useHealthMultiplier = true;
+    	}
     }
     
     public void setFlatHealth(int flatHealth) {

@@ -4,8 +4,10 @@ import java.util.*;
 
 import com.garbagemule.MobArena.ArenaClass;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.Lever;
 
 import com.garbagemule.MobArena.Messenger;
 import com.garbagemule.MobArena.framework.Arena;
@@ -117,6 +119,9 @@ public class WaveParser
         // Grab the specific spawnpoints if any
         List<Location> spawnpoints = getSpawnpoints(arena, name, config);
         
+        // Grab the specific levers if any
+        List<Block> levers = getLevers(arena, name, config);
+        
         // Recurrent must have priority + frequency, single must have firstWave
         if (branch == WaveBranch.RECURRENT && (priority == -1 || frequency <= 0)) {
             Messenger.warning(WaveError.RECURRENT_NODES.format(name, arena.configName()));
@@ -139,6 +144,7 @@ public class WaveParser
         
         // Aaand the spawnpoints
         result.setSpawnpoints(spawnpoints);
+        result.setLevers(levers);
         
         return result;
     }
@@ -364,6 +370,32 @@ public class WaveParser
             }
             
             result.add(spawnpoint);
+        }
+        
+        return result;
+    }
+    
+    private static List<Block> getLevers(Arena arena, String name, ConfigurationSection config) {
+    	List<Block> result = new ArrayList<Block>();
+        
+        String leversString = config.getString("levers");
+        if (leversString == null) {
+            return result;
+        }
+        
+        // Split the string by commas
+        String[] levers = leversString.split(",");
+        
+        ArenaRegion region = arena.getRegion();
+        for (String leverName : levers) {
+        	Block lever = region.getLever(leverName.trim());
+            
+            if (lever == null) {
+                Messenger.warning("Lever '" + leverName + "' in wave '" + name + "' for arena '" + arena.configName() + "' could not be parsed!");
+                continue;
+            }
+            
+            result.add(lever);
         }
         
         return result;

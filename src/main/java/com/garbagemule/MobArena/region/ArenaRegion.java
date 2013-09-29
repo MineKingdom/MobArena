@@ -8,12 +8,14 @@ import com.garbagemule.MobArena.util.Enums;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.material.Lever;
 
 import java.util.*;
 
@@ -27,12 +29,16 @@ public class ArenaRegion
     private Location lastP1, lastP2, lastL1, lastL2;
     private Location p1, p2, l1, l2, arenaWarp, lobbyWarp, specWarp, exitWarp, leaderboard;
     private Map<String,Location> spawnpoints, containers;
+
+    // levers
+    private Map<String, Block> levers;
     
     private boolean setup, lobbySetup;
     
     private ConfigurationSection coords;
     private ConfigurationSection spawns;
     private ConfigurationSection chests;
+    private ConfigurationSection leverConfig;
     
     public ArenaRegion(ConfigurationSection section, Arena arena) {
         this.arena  = arena;
@@ -41,6 +47,7 @@ public class ArenaRegion
         this.coords = makeSection(section, "coords");
         this.spawns = makeSection(coords,  "spawnpoints");
         this.chests = makeSection(coords,  "containers");
+        this.leverConfig = makeSection(coords,  "levers");
         
         reloadAll();
     }
@@ -55,6 +62,7 @@ public class ArenaRegion
         reloadLeaderboards();
         reloadSpawnpoints();
         reloadChests();
+        reloadLevers();
         
         verifyData();
     }
@@ -104,6 +112,26 @@ public class ArenaRegion
         if (keys != null) {
             for (String chst : keys) {
                 containers.put(chst, parseLocation(chests, chst, world));
+            }
+        }
+    }
+    
+    public void reloadLevers() {
+        levers = new HashMap<String, Block>();
+        Set<String> keys = leverConfig.getKeys(false);
+        if (keys != null) {
+            for (String lever : keys) {
+            	Location loc = parseLocation(leverConfig, lever, world);
+            	if (loc == null) {
+            		Messenger.warning("Lever '" + lever + "' for arena '" + arena.configName() + "' could not be parsed!");
+            		continue;
+            	}
+            	Block block = world.getBlockAt(loc);
+            	if (block.getState().getData() instanceof Lever) {
+            		levers.put(lever, block);
+            	} else {
+            		Messenger.warning("Lever location '" + lever + "' (" + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ() + ":" + loc.getWorld().getName() + ") for arena '" + arena.configName() + "' does not reference a lever!");
+            	}
             }
         }
     }
@@ -405,6 +433,14 @@ public class ArenaRegion
     
     public Collection<Location> getContainers() {
         return containers.values();
+    }
+    
+    public Collection<Block> getLevers() {
+        return levers.values();
+    }
+    
+    public Block getLever(String name) {
+        return levers.get(name);
     }
     
     public Location getLeaderboard() {

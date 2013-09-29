@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Location;
+import org.bukkit.block.Block;
+import org.bukkit.material.Lever;
 
 import com.garbagemule.MobArena.framework.Arena;
 import com.garbagemule.MobArena.waves.enums.*;
@@ -152,4 +154,9 @@ public interface Wave
      * @return true, if the wave should spawn, false otherwise
      */
     public boolean matches(int wave);
+    
+    
+    public List<Block> getLevers();
+
+	public void setLevers(List<Block> levers);
 }

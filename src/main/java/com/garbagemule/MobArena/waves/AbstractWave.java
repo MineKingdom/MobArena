@@ -1,9 +1,13 @@
 package com.garbagemule.MobArena.waves;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Location;
+import org.bukkit.block.Block;
+import org.bukkit.material.Lever;
 
 import com.garbagemule.MobArena.framework.Arena;
 import com.garbagemule.MobArena.waves.enums.*;
@@ -21,12 +25,28 @@ public abstract class AbstractWave implements Wave
     
     private List<Location> spawnpoints;
     
+    private List<Block> levers = new ArrayList<Block>();
+    
     @Override
     public abstract Map<MACreature, Integer> getMonstersToSpawn(int wave, int playerCount, Arena arena);
+    
+    @Override
+    public List<Block> getLevers() {
+    	return Collections.unmodifiableList(levers);
+    }
+    
+    @Override
+    public void setLevers(List<Block> levers) {
+    	if (levers == null) {
+    		return;
+    	}
+		this.levers = levers;
+	}
 
     @Override
     public List<Location> getSpawnpoints(Arena arena) {
-        return WaveUtils.getValidSpawnpoints(arena, spawnpoints, arena.getPlayersInArena());
+    	return Collections.unmodifiableList(spawnpoints);
+        //return WaveUtils.getValidSpawnpoints(arena, spawnpoints, arena.getPlayersInArena());
     }
     
     @Override
